@@ -120,7 +120,15 @@ Environment variables can be set in `.env` file (create from `.env.example`):
 
 ## Database Schema
 
-### Users Table
+### Overview
+
+The database consists of three main tables:
+
+![Database Schema](docs/db/db_schema.png)
+
+### Tables
+
+#### Users Table
 ```sql
 CREATE TABLE users (
     id SERIAL PRIMARY KEY,
@@ -129,6 +137,36 @@ CREATE TABLE users (
     created_at TIMESTAMP DEFAULT NOW()
 );
 ```
+
+#### Tokens Table
+```sql
+CREATE TABLE tokens (
+    id SERIAL PRIMARY KEY,
+    user_id INT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    token TEXT UNIQUE NOT NULL,
+    expires_at TIMESTAMP NOT NULL,
+    revoked BOOLEAN DEFAULT FALSE,
+    created_at TIMESTAMP DEFAULT NOW()
+);
+```
+
+#### Images Table
+```sql
+CREATE TABLE images (
+    id SERIAL PRIMARY KEY,
+    user_id INT REFERENCES users(id) ON DELETE SET NULL,
+    filename VARCHAR(255) NOT NULL,
+    content_type VARCHAR(255) NOT NULL,
+    size_bytes BIGINT NOT NULL,
+    path TEXT NOT NULL,
+    uploaded_at TIMESTAMP DEFAULT NOW()
+);
+```
+
+### Relationships
+
+- **users → tokens**: One-to-Many (One user can have many tokens)
+- **users → images**: One-to-Many (One user can have many images)
 
 ## Authentication Middleware
 
