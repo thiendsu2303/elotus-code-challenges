@@ -22,11 +22,12 @@ func main() {
 
 	// Initialize layers
 	userRepo := repository.NewUserRepository(db)
-	userUsecase := usecase.NewUserUsecase(userRepo)
-	userHandler := handler.NewUserHandler(userUsecase)
+	registerUsecase := usecase.NewRegisterUsecase(userRepo)
+	registerHandler := handler.NewRegisterHandler(registerUsecase)
+	pingHandler := handler.NewPingHandler()
 
 	// Setup router
-	r := router.SetupRouter(userHandler)
+	r := router.SetupRouter(pingHandler, registerHandler)
 
 	// Start server
 	if err := r.Run(":" + cfg.ServerPort); err != nil {

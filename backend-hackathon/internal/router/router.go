@@ -8,24 +8,21 @@ import (
 
 // SetupRouter configures all routes and returns a configured Gin engine
 func SetupRouter(
-	userHandler *handler.UserHandler,
+	pingHandler *handler.PingHandler,
+	registerHandler *handler.RegisterHandler,
 ) *gin.Engine {
 	r := gin.Default()
 
 	// Health check endpoint
-	r.GET("/ping", userHandler.Ping)
+	r.GET("/ping", pingHandler.Ping)
 
 	// API routes
 	api := r.Group("/api/v1")
 	{
-		// User routes
-		users := api.Group("/users")
+		// Auth routes
+		auth := api.Group("/auth")
 		{
-			users.POST("", userHandler.CreateUser)
-			users.GET("", userHandler.GetAllUsers)
-			users.GET("/:id", userHandler.GetUserByID)
-			users.PUT("/:id", userHandler.UpdateUser)
-			users.DELETE("/:id", userHandler.DeleteUser)
+			auth.POST("/register", registerHandler.Register)
 		}
 	}
 
