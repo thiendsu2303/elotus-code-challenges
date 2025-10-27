@@ -15,8 +15,16 @@ func NewPingHandler() *PingHandler {
 }
 
 func (h *PingHandler) Ping(c *gin.Context) {
-	c.JSON(http.StatusOK, response.BaseResponse{
-		Status:  "success",
-		Message: "pong",
-	})
+    c.JSON(http.StatusOK, response.BaseResponse{
+        Status:  "success",
+        Message: "pong",
+    })
+}
+
+// PingWithAuth requires authentication and returns a success pong
+func (h *PingHandler) PingWithAuth(c *gin.Context) {
+    c.JSON(http.StatusOK, response.BaseResponse{
+        Status:  "success",
+        Message: "pong_auth",
+    })
 }

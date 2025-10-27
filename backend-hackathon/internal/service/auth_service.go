@@ -16,13 +16,14 @@ type AuthService interface {
 }
 
 type authService struct {
-	userRepo  repository.UserRepository
-	jwtSecret string
-	accessTTL time.Duration
+    userRepo  repository.UserRepository
+    jwtSecret string
+    jwtIssuer string
+    accessTTL time.Duration
 }
 
-func NewAuthService(userRepo repository.UserRepository, jwtSecret string, accessTTL time.Duration) AuthService {
-	return &authService{userRepo: userRepo, jwtSecret: jwtSecret, accessTTL: accessTTL}
+func NewAuthService(userRepo repository.UserRepository, jwtSecret string, jwtIssuer string, accessTTL time.Duration) AuthService {
+    return &authService{userRepo: userRepo, jwtSecret: jwtSecret, jwtIssuer: jwtIssuer, accessTTL: accessTTL}
 }
 
 func (s *authService) Register(username, password string) (*domain.User, error) {
@@ -61,12 +62,12 @@ func (s *authService) Login(username, password string) (string, time.Time, error
 	now := time.Now().UTC()
 	exp := now.Add(s.accessTTL)
 
-	claims := jwt.MapClaims{
-		"sub": user.ID,
-		"iat": now.Unix(),
-		"exp": exp.Unix(),
-		"iss": "backend-hackathon",
-	}
+    claims := jwt.MapClaims{
+        "sub": user.ID,
+        "iat": now.Unix(),
+        "exp": exp.Unix(),
+        "iss": s.jwtIssuer,
+    }
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 	signed, err := token.SignedString([]byte(s.jwtSecret))

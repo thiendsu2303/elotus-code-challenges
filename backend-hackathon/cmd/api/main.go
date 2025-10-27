@@ -7,9 +7,10 @@ import (
 
     "backend-hackathon/internal/config"
     "backend-hackathon/internal/handler"
+    "backend-hackathon/internal/middleware"
     "backend-hackathon/internal/repository"
-    "backend-hackathon/internal/service"
     "backend-hackathon/internal/router"
+    "backend-hackathon/internal/service"
 )
 
 func main() {
@@ -29,12 +30,13 @@ func main() {
     if err != nil || ttlSeconds <= 0 {
         ttlSeconds = 3600
     }
-    authService := service.NewAuthService(userRepo, cfg.JWTSecret, time.Duration(ttlSeconds)*time.Second)
+    authService := service.NewAuthService(userRepo, cfg.JWTSecret, cfg.JWTIssuer, time.Duration(ttlSeconds)*time.Second)
     authHandler := handler.NewAuthHandler(authService)
     pingHandler := handler.NewPingHandler()
+    authMW := middleware.AuthMiddleware(userRepo, cfg.JWTSecret, cfg.JWTIssuer)
 
 	// Setup router
-	r := router.SetupRouter(pingHandler, authHandler)
+    r := router.SetupRouter(pingHandler, authHandler, authMW)
 
 	// Start server
 	if err := r.Run(":" + cfg.ServerPort); err != nil {
