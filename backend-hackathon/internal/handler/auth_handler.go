@@ -16,15 +16,27 @@ type AuthHandler struct {
 }
 
 func NewAuthHandler(authService service.AuthService) *AuthHandler {
-	return &AuthHandler{authService: authService}
+    return &AuthHandler{authService: authService}
 }
 
+// Register godoc
+// @Summary Register
+// @Description Create a new user account
+// @Tags auth
+// @Accept json
+// @Produce json
+// @Param data body requests.RegisterRequest true "Register payload"
+// @Success 201 {object} response.RegisterResponse
+// @Failure 400 {object} response.ErrorResponse
+// @Failure 409 {object} response.ErrorResponse
+// @Failure 500 {object} response.ErrorResponse
+// @Router /api/v1/auth/register [post]
 func (h *AuthHandler) Register(c *gin.Context) {
-	var req requests.RegisterRequest
-	if err := c.ShouldBindJSON(&req); err != nil {
-		c.JSON(http.StatusBadRequest, response.NewError("invalid payload"))
-		return
-	}
+    var req requests.RegisterRequest
+    if err := c.ShouldBindJSON(&req); err != nil {
+        c.JSON(http.StatusBadRequest, response.NewError("invalid payload"))
+        return
+    }
 
 	user, err := h.authService.Register(req.Username, req.Password)
 	if err != nil {
@@ -43,12 +55,23 @@ func (h *AuthHandler) Register(c *gin.Context) {
 	c.JSON(http.StatusCreated, resp)
 }
 
+// Login godoc
+// @Summary Login
+// @Description Obtain JWT access token
+// @Tags auth
+// @Accept json
+// @Produce json
+// @Param data body requests.LoginRequest true "Login payload"
+// @Success 200 {object} response.LoginResponse
+// @Failure 400 {object} response.ErrorResponse
+// @Failure 401 {object} response.ErrorResponse
+// @Router /api/v1/auth/login [post]
 func (h *AuthHandler) Login(c *gin.Context) {
-	var req requests.LoginRequest
-	if err := c.ShouldBindJSON(&req); err != nil {
-		c.JSON(http.StatusBadRequest, response.NewError("invalid payload"))
-		return
-	}
+    var req requests.LoginRequest
+    if err := c.ShouldBindJSON(&req); err != nil {
+        c.JSON(http.StatusBadRequest, response.NewError("invalid payload"))
+        return
+    }
 
 	token, exp, err := h.authService.Login(req.Username, req.Password)
 	if err != nil {
@@ -68,6 +91,16 @@ func (h *AuthHandler) Login(c *gin.Context) {
 }
 
 func (h *AuthHandler) Logout(c *gin.Context) {
+    // Logout godoc
+    // @Summary Logout
+    // @Description Revoke tokens for current user; requires auth
+    // @Tags auth
+    // @Produce json
+    // @Security BearerAuth
+    // @Success 200 {object} response.BaseResponse
+    // @Failure 401 {object} response.ErrorResponse
+    // @Failure 500 {object} response.ErrorResponse
+    // @Router /api/v1/auth/logout [post]
     uidAny, ok := c.Get("user_id")
     if !ok {
         c.JSON(http.StatusUnauthorized, response.NewError("unauthorized"))

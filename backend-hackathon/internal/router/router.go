@@ -6,6 +6,8 @@ import (
 
     "github.com/gin-contrib/cors"
     "github.com/gin-gonic/gin"
+    swaggerFiles "github.com/swaggo/files"
+    ginSwagger "github.com/swaggo/gin-swagger"
 )
 
 // SetupRouter configures all routes and returns a configured Gin engine
@@ -29,6 +31,9 @@ func SetupRouter(
 
 	// Health check endpoint
 	r.GET("/ping", pingHandler.Ping)
+
+    // Swagger UI
+    r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 
     // API routes
     api := r.Group("/api/v1")

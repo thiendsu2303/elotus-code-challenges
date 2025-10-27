@@ -1,5 +1,15 @@
 package main
 
+// @title Backend Hackathon API
+// @version 1.0
+// @description Swagger documentation for exposed APIs.
+// @BasePath /
+// @host localhost:8080
+// @schemes http
+// @securityDefinitions.apikey BearerAuth
+// @in header
+// @name Authorization
+
 import (
     "log"
     "strconv"
@@ -11,11 +21,18 @@ import (
     "backend-hackathon/internal/repository"
     "backend-hackathon/internal/router"
     "backend-hackathon/internal/service"
+
+    docs "backend-hackathon/docs"
 )
 
 func main() {
-	// Load configuration
-	cfg := config.LoadConfig()
+    // Load configuration
+    cfg := config.LoadConfig()
+
+    // Configure Swagger docs
+    docs.SwaggerInfo.BasePath = "/"
+    docs.SwaggerInfo.Host = "localhost:" + cfg.ServerPort
+    docs.SwaggerInfo.Schemes = []string{"http"}
 
 	// Initialize database
 	db, err := config.InitDatabase(cfg)

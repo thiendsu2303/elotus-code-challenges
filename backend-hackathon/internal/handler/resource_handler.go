@@ -18,6 +18,15 @@ func NewResourceHandler(imageService service.ImageService) *ResourceHandler {
 }
 
 // ListMyImages returns images belonging to the authenticated user (from token)
+// @Summary List my images
+// @Description Returns images belonging to the authenticated user
+// @Tags resource
+// @Produce json
+// @Security BearerAuth
+// @Success 200 {object} response.ImagesResponse
+// @Failure 401 {object} response.ErrorResponse
+// @Failure 500 {object} response.ErrorResponse
+// @Router /api/v1/resource/images [get]
 func (h *ResourceHandler) ListMyImages(c *gin.Context) {
     uidAny, ok := c.Get("user_id")
     if !ok {

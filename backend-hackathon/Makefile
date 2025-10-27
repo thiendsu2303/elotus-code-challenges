@@ -62,6 +62,10 @@ run: ## Run the application
 test: ## Run tests
 	go test -v ./...
 
+swagger: ## Generate Swagger docs (requires Go and swag CLI)
+	@go install github.com/swaggo/swag/cmd/swag@latest
+	swag init -g cmd/api/main.go -o docs
+
 .DEFAULT_GOAL := help
 
 # Admin tools
