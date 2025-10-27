@@ -2,7 +2,6 @@ package domain
 
 import "time"
 
-// Image represents an uploaded image metadata
 type Image struct {
 	ID          uint      `gorm:"primaryKey" json:"id"`
 	UserID      *uint     `gorm:"index" json:"user_id"`
@@ -13,7 +12,6 @@ type Image struct {
 	UploadedAt  time.Time `gorm:"autoCreateTime;column:uploaded_at" json:"uploaded_at"`
 }
 
-// TableName specifies the table name for Image
 func (Image) TableName() string {
 	return "images"
 }

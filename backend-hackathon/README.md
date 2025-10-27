@@ -134,21 +134,12 @@ CREATE TABLE users (
     id SERIAL PRIMARY KEY,
     username VARCHAR(255) UNIQUE NOT NULL,
     password_hash TEXT NOT NULL,
-    created_at TIMESTAMP DEFAULT NOW()
+    created_at TIMESTAMP DEFAULT NOW(),
+    revoked_at TIMESTAMP NULL
 );
 ```
 
-#### Tokens Table
-```sql
-CREATE TABLE tokens (
-    id SERIAL PRIMARY KEY,
-    user_id INT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-    token TEXT UNIQUE NOT NULL,
-    expires_at TIMESTAMP NOT NULL,
-    revoked BOOLEAN DEFAULT FALSE,
-    created_at TIMESTAMP DEFAULT NOW()
-);
-```
+Tokens table đã được loại bỏ trong thiết kế hiện tại (JWT stateless + revoke theo thời điểm bằng `users.revoked_at`).
 
 #### Images Table
 ```sql
@@ -165,7 +156,6 @@ CREATE TABLE images (
 
 ### Relationships
 
-- **users → tokens**: One-to-Many (One user can have many tokens)
 - **users → images**: One-to-Many (One user can have many images)
 
 ## Authentication Middleware

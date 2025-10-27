@@ -9,7 +9,6 @@ import (
 	"gorm.io/gorm"
 )
 
-// InitDatabase initializes the database connection
 func InitDatabase(cfg *Config) (*gorm.DB, error) {
 	dsn := cfg.GetDSN()
 

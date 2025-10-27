@@ -1,49 +1,78 @@
 package service
 
 import (
-    "backend-hackathon/internal/domain"
-    "backend-hackathon/internal/repository"
-    "errors"
+	"backend-hackathon/internal/domain"
+	"backend-hackathon/internal/repository"
+	"errors"
+	"time"
 
-    "golang.org/x/crypto/bcrypt"
+	jwt "github.com/golang-jwt/jwt/v5"
+	"golang.org/x/crypto/bcrypt"
 )
 
-// AuthService defines authentication related operations
 type AuthService interface {
-    Register(username, password string) (*domain.User, error)
+	Register(username, password string) (*domain.User, error)
+	Login(username, password string) (string, time.Time, error)
 }
 
 type authService struct {
-    userRepo repository.UserRepository
+	userRepo  repository.UserRepository
+	jwtSecret string
+	accessTTL time.Duration
 }
 
-// NewAuthService creates a new instance of AuthService
-func NewAuthService(userRepo repository.UserRepository) AuthService {
-    return &authService{userRepo: userRepo}
+func NewAuthService(userRepo repository.UserRepository, jwtSecret string, accessTTL time.Duration) AuthService {
+	return &authService{userRepo: userRepo, jwtSecret: jwtSecret, accessTTL: accessTTL}
 }
 
-// Register creates a new user with hashed password after validating username uniqueness
 func (s *authService) Register(username, password string) (*domain.User, error) {
-    // Check if username already exists
-    existingUser, err := s.userRepo.GetByUsername(username)
-    if err == nil && existingUser != nil {
-        return nil, errors.New("username already exists")
-    }
+	existingUser, err := s.userRepo.GetByUsername(username)
+	if err == nil && existingUser != nil {
+		return nil, errors.New("username already exists")
+	}
 
-    // Hash password
-    passwordHash, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
-    if err != nil {
-        return nil, err
-    }
+	passwordHash, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
+	if err != nil {
+		return nil, err
+	}
 
-    user := &domain.User{
-        Username:     username,
-        PasswordHash: string(passwordHash),
-    }
+	user := &domain.User{
+		Username:     username,
+		PasswordHash: string(passwordHash),
+	}
 
-    if err := s.userRepo.Create(user); err != nil {
-        return nil, err
-    }
+	if err := s.userRepo.Create(user); err != nil {
+		return nil, err
+	}
 
-    return user, nil
+	return user, nil
+}
+
+func (s *authService) Login(username, password string) (string, time.Time, error) {
+	user, err := s.userRepo.GetByUsername(username)
+	if err != nil || user == nil {
+		return "", time.Time{}, errors.New("invalid credentials")
+	}
+
+	if err := bcrypt.CompareHashAndPassword([]byte(user.PasswordHash), []byte(password)); err != nil {
+		return "", time.Time{}, errors.New("invalid credentials")
+	}
+
+	now := time.Now().UTC()
+	exp := now.Add(s.accessTTL)
+
+	claims := jwt.MapClaims{
+		"sub": user.ID,
+		"iat": now.Unix(),
+		"exp": exp.Unix(),
+		"iss": "backend-hackathon",
+	}
+
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
+	signed, err := token.SignedString([]byte(s.jwtSecret))
+	if err != nil {
+		return "", time.Time{}, err
+	}
+
+	return signed, exp, nil
 }

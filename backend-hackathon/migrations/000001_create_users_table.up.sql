@@ -7,5 +7,5 @@ CREATE TABLE IF NOT EXISTS users (
 );
 
 -- Create index on username for faster lookups
-CREATE INDEX idx_users_username ON users(username);
+CREATE INDEX IF NOT EXISTS idx_users_username ON users(username);
 

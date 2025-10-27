@@ -2,6 +2,8 @@ package main
 
 import (
     "log"
+    "strconv"
+    "time"
 
     "backend-hackathon/internal/config"
     "backend-hackathon/internal/handler"
@@ -22,7 +24,12 @@ func main() {
 
     // Initialize layers
     userRepo := repository.NewUserRepository(db)
-    authService := service.NewAuthService(userRepo)
+    // Parse Access Token TTL (seconds)
+    ttlSeconds, err := strconv.Atoi(cfg.AccessTokenTTL)
+    if err != nil || ttlSeconds <= 0 {
+        ttlSeconds = 3600
+    }
+    authService := service.NewAuthService(userRepo, cfg.JWTSecret, time.Duration(ttlSeconds)*time.Second)
     authHandler := handler.NewAuthHandler(authService)
     pingHandler := handler.NewPingHandler()
 
