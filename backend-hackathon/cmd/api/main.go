@@ -1,13 +1,13 @@
 package main
 
 import (
-	"log"
+    "log"
 
-	"backend-hackathon/internal/config"
-	"backend-hackathon/internal/handler"
-	"backend-hackathon/internal/repository"
-	"backend-hackathon/internal/router"
-	"backend-hackathon/internal/usecase"
+    "backend-hackathon/internal/config"
+    "backend-hackathon/internal/handler"
+    "backend-hackathon/internal/repository"
+    "backend-hackathon/internal/service"
+    "backend-hackathon/internal/router"
 )
 
 func main() {
@@ -20,14 +20,14 @@ func main() {
 		log.Fatalf("Failed to initialize database: %v", err)
 	}
 
-	// Initialize layers
-	userRepo := repository.NewUserRepository(db)
-	registerUsecase := usecase.NewRegisterUsecase(userRepo)
-	registerHandler := handler.NewRegisterHandler(registerUsecase)
-	pingHandler := handler.NewPingHandler()
+    // Initialize layers
+    userRepo := repository.NewUserRepository(db)
+    authService := service.NewAuthService(userRepo)
+    authHandler := handler.NewAuthHandler(authService)
+    pingHandler := handler.NewPingHandler()
 
 	// Setup router
-	r := router.SetupRouter(pingHandler, registerHandler)
+	r := router.SetupRouter(pingHandler, authHandler)
 
 	// Start server
 	if err := r.Run(":" + cfg.ServerPort); err != nil {

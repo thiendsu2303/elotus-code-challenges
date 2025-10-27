@@ -9,7 +9,7 @@ import (
 // SetupRouter configures all routes and returns a configured Gin engine
 func SetupRouter(
 	pingHandler *handler.PingHandler,
-	registerHandler *handler.RegisterHandler,
+	authHandler *handler.AuthHandler,
 ) *gin.Engine {
 	r := gin.Default()
 
@@ -22,7 +22,7 @@ func SetupRouter(
 		// Auth routes
 		auth := api.Group("/auth")
 		{
-			auth.POST("/register", registerHandler.Register)
+			auth.POST("/register", authHandler.Register)
 		}
 	}
 
