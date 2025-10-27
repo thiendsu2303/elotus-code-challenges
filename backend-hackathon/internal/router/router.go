@@ -53,6 +53,8 @@ func SetupRouter(
             protected.POST("/auth/logout", authHandler.Logout)
             // Resource routes
             protected.GET("/resource/images", resourceHandler.ListMyImages)
+            // Upload route
+            protected.POST("/upload", resourceHandler.UploadImage)
         }
     }
 

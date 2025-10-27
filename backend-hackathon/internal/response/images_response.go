@@ -49,3 +49,15 @@ func FromDomainImages(images []domain.Image) []ImageItem {
     }
     return out
 }
+
+func FromDomainImage(im domain.Image) ImageItem {
+    return ImageItem{
+        ID:          im.ID,
+        UserID:      im.UserID,
+        Filename:    im.Filename,
+        ContentType: im.ContentType,
+        SizeBytes:   im.SizeBytes,
+        Path:        im.Path,
+        UploadedAt:  im.UploadedAt,
+    }
+}

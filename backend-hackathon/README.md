@@ -62,6 +62,22 @@ This will start a PostgreSQL container on port 5432.
 make migrate-up
 ```
 
+Alternatively, you can use the helper script:
+
+```bash
+# Show current version
+./scripts/migrate.sh version
+
+# Run all migrations up
+./scripts/migrate.sh up
+
+# Create a new migration
+./scripts/migrate.sh create add_new_table
+
+# Rollback all migrations
+./scripts/migrate.sh down
+```
+
 ### 4. Run the Application
 
 ```bash
@@ -185,4 +201,19 @@ make test
 ## License
 
 MIT
+## Migration Helper Script
+
+For convenience, a wrapper script is available at `scripts/migrate.sh`.
+
+Environment overrides:
+- `DB_URL` (default: `postgres://postgres:postgres@localhost:5432/hackathon_db?sslmode=disable`)
+- `MIGRATIONS_DIR` (default: `migrations`)
+
+Examples:
+
+```bash
+./scripts/migrate.sh up
+./scripts/migrate.sh create add_http_metadata_to_images
+./scripts/migrate.sh down
+```
 

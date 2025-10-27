@@ -8,6 +8,7 @@ import (
 
 type ImageRepository interface {
     ListByUserID(userID uint) ([]domain.Image, error)
+    Create(image domain.Image) (domain.Image, error)
 }
 
 type imageRepository struct {
@@ -24,4 +25,11 @@ func (r *imageRepository) ListByUserID(userID uint) ([]domain.Image, error) {
         return nil, err
     }
     return images, nil
+}
+
+func (r *imageRepository) Create(image domain.Image) (domain.Image, error) {
+    if err := r.db.Create(&image).Error; err != nil {
+        return domain.Image{}, err
+    }
+    return image, nil
 }
