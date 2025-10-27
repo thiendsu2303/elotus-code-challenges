@@ -64,3 +64,14 @@ test: ## Run tests
 
 .DEFAULT_GOAL := help
 
+# Admin tools
+revoke-all: ## Revoke tokens for all users (sets users.revoked_at = NOW())
+	go run cmd/admin/main.go --all
+
+revoke-users: ## Revoke tokens for a list of usernames, pass USERS="alice,bob"
+	@if [ -z "$(USERS)" ]; then \
+		echo "USERS variable is required. Example: make revoke-users USERS=alice,bob"; \
+		exit 1; \
+	fi
+	go run cmd/admin/main.go --users $(USERS)
+
