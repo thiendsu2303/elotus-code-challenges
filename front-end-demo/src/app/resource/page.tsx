@@ -52,6 +52,19 @@ export default function ResourcePage() {
       }
     } catch (err: any) {
       setUploadError(err?.message || "Upload failed");
+      // Reset lựa chọn để người dùng có thể upload file khác ngay
+      setFile(null);
+      setUploadProgress(0);
+      if (previewUrl) {
+        URL.revokeObjectURL(previewUrl);
+        setPreviewUrl(null);
+      }
+      if (fileInputRef.current) {
+        try {
+          // Reset giá trị input file để cho phép chọn cùng tên file lần nữa
+          (fileInputRef.current as HTMLInputElement).value = "";
+        } catch {}
+      }
     } finally {
       setUploading(false);
     }
@@ -121,7 +134,12 @@ export default function ResourcePage() {
                 </div>
               )}
               {uploadError && (
-                <div className="text-sm text-red-600">{uploadError}</div>
+                <div className="text-sm text-red-600 flex items-center gap-2">
+                  <span>{uploadError}</span>
+                  <Button type="button" variant="outline" onClick={() => fileInputRef.current?.click()}>
+                    Chọn tệp khác
+                  </Button>
+                </div>
               )}
               <Button type="submit" disabled={uploading}>
                 {uploading ? "Uploading..." : "Upload File"}

@@ -188,7 +188,7 @@ const docTemplate = `{
                         "BearerAuth": []
                     }
                 ],
-                "description": "Upload an image file (PNG/JPEG/WebP) up to 8MB; validates content-type starts with image/*; saves file under repo-local directory tmp/ with generated name img_*; persists metadata (filename, content_type, size_bytes, path, user_agent, client_ip).",
+                "description": "Upload an image file (PNG/JPEG/WebP) up to 8MB. Client may send any file via form field \"file\"; backend detects content-type from the first 512 bytes and rejects non-image with 415; after confirming image, checks size (<= 8MB) and rejects with 413. Accepts legacy form field \"data\" as a fallback. Saves file under repo-local directory tmp/ with generated name img_*; persists metadata (filename, content_type, size_bytes, path, user_agent, client_ip).",
                 "consumes": [
                     "multipart/form-data"
                 ],
