@@ -66,3 +66,33 @@ func (h *AuthHandler) Login(c *gin.Context) {
 	}
 	c.JSON(http.StatusOK, resp)
 }
+
+func (h *AuthHandler) Logout(c *gin.Context) {
+    uidAny, ok := c.Get("user_id")
+    if !ok {
+        c.JSON(http.StatusUnauthorized, response.NewError("unauthorized"))
+        return
+    }
+
+    var uid uint
+    switch v := uidAny.(type) {
+    case uint:
+        uid = v
+    case int:
+        uid = uint(v)
+    case int64:
+        uid = uint(v)
+    case float64:
+        uid = uint(v)
+    default:
+        c.JSON(http.StatusUnauthorized, response.NewError("unauthorized"))
+        return
+    }
+
+    if err := h.authService.Logout(uid); err != nil {
+        c.JSON(http.StatusInternalServerError, response.NewError("internal error"))
+        return
+    }
+
+    c.JSON(http.StatusOK, response.BaseResponse{Status: "success", Message: "logged_out"})
+}

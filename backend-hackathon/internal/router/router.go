@@ -44,6 +44,7 @@ func SetupRouter(
         protected.Use(authMW)
         {
             protected.GET("/ping-auth", pingHandler.PingWithAuth)
+            protected.POST("/auth/logout", authHandler.Logout)
         }
     }
 

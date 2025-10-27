@@ -4,29 +4,11 @@ import React from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
-import { authGet } from "@/lib/api";
+import { useRequireAuth } from "@/lib/auth";
 
 export default function ResourcePage() {
   const router = useRouter();
-  const [message, setMessage] = React.useState<string>("");
-  const [error, setError] = React.useState<string | null>(null);
-
-  React.useEffect(() => {
-    async function load() {
-      try {
-        const res = await authGet("/api/v1/ping-auth");
-        setMessage(res.message || "pong_auth");
-      } catch (err) {
-        setError("Unauthorized. Please login.");
-      }
-    }
-    load();
-  }, []);
-
-  function logout() {
-    localStorage.removeItem("access_token");
-    router.push("/login");
-  }
+  const { message, error, loading, logout } = useRequireAuth();
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-zinc-50">
@@ -35,7 +17,9 @@ export default function ResourcePage() {
           <h2 className="text-xl font-semibold">Protected Resource</h2>
         </CardHeader>
         <CardContent>
-          {error ? (
+          {loading ? (
+            <div className="text-sm text-zinc-500 mb-4">Loading...</div>
+          ) : error ? (
             <div className="text-sm text-red-600 mb-4">{error}</div>
           ) : (
             <div className="text-sm text-zinc-800 mb-4">Response: {message}</div>

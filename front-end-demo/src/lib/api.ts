@@ -79,3 +79,21 @@ export async function authGet(path: string): Promise<any> {
   }
   return res.json();
 }
+
+export async function logout(): Promise<boolean> {
+  const token = typeof window !== "undefined" ? localStorage.getItem("access_token") : null;
+  if (!token) return true; // nothing to do
+  try {
+    const res = await fetch(`${API_BASE}/api/v1/auth/logout`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    // Even if backend returns non-200, we still proceed to clear token on client.
+    return res.ok;
+  } catch (e) {
+    return false;
+  }
+}

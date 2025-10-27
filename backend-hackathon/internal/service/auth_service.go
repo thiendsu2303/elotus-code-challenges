@@ -11,8 +11,9 @@ import (
 )
 
 type AuthService interface {
-	Register(username, password string) (*domain.User, error)
-	Login(username, password string) (string, time.Time, error)
+    Register(username, password string) (*domain.User, error)
+    Login(username, password string) (string, time.Time, error)
+    Logout(userID uint) error
 }
 
 type authService struct {
@@ -76,4 +77,14 @@ func (s *authService) Login(username, password string) (string, time.Time, error
 	}
 
 	return signed, exp, nil
+}
+
+func (s *authService) Logout(userID uint) error {
+    user, err := s.userRepo.GetByID(userID)
+    if err != nil || user == nil {
+        return errors.New("invalid user")
+    }
+    now := time.Now().UTC()
+    user.RevokedAt = &now
+    return s.userRepo.Update(user)
 }
