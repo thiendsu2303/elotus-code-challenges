@@ -97,3 +97,38 @@ export async function logout(): Promise<boolean> {
     return false;
   }
 }
+
+export type ImageItem = {
+  id: number;
+  userId?: number | null;
+  filename: string;
+  contentType: string;
+  sizeBytes: number;
+  path: string;
+  uploadedAt: string;
+};
+
+export async function getMyImages(): Promise<ImageItem[]> {
+  const token = typeof window !== "undefined" ? localStorage.getItem("access_token") : null;
+  const res = await fetch(`${API_BASE}/api/v1/resource/images`, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+      ...(token ? { Authorization: `Bearer ${token}` } : {}),
+    },
+  });
+  if (!res.ok) {
+    throw new Error(`Request failed: ${res.status}`);
+  }
+  const json = await res.json();
+  const items = Array.isArray(json.data) ? json.data : [];
+  return items.map((it: any) => ({
+    id: it.id,
+    userId: it.user_id ?? null,
+    filename: it.filename,
+    contentType: it.content_type,
+    sizeBytes: it.size_bytes,
+    path: it.path,
+    uploadedAt: it.uploaded_at,
+  }));
+}

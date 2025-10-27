@@ -25,18 +25,21 @@ func main() {
 
     // Initialize layers
     userRepo := repository.NewUserRepository(db)
+    imageRepo := repository.NewImageRepository(db)
     // Parse Access Token TTL (seconds)
     ttlSeconds, err := strconv.Atoi(cfg.AccessTokenTTL)
     if err != nil || ttlSeconds <= 0 {
         ttlSeconds = 3600
     }
     authService := service.NewAuthService(userRepo, cfg.JWTSecret, cfg.JWTIssuer, time.Duration(ttlSeconds)*time.Second)
+    imageService := service.NewImageService(imageRepo)
     authHandler := handler.NewAuthHandler(authService)
+    resourceHandler := handler.NewResourceHandler(imageService)
     pingHandler := handler.NewPingHandler()
     authMW := middleware.AuthMiddleware(userRepo, cfg.JWTSecret, cfg.JWTIssuer)
 
 	// Setup router
-    r := router.SetupRouter(pingHandler, authHandler, authMW)
+    r := router.SetupRouter(pingHandler, authHandler, resourceHandler, authMW)
 
 	// Start server
 	if err := r.Run(":" + cfg.ServerPort); err != nil {

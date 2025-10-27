@@ -12,6 +12,7 @@ import (
 func SetupRouter(
     pingHandler *handler.PingHandler,
     authHandler *handler.AuthHandler,
+    resourceHandler *handler.ResourceHandler,
     authMW gin.HandlerFunc,
 ) *gin.Engine {
     r := gin.Default()
@@ -45,6 +46,8 @@ func SetupRouter(
         {
             protected.GET("/ping-auth", pingHandler.PingWithAuth)
             protected.POST("/auth/logout", authHandler.Logout)
+            // Resource routes
+            protected.GET("/resource/images", resourceHandler.ListMyImages)
         }
     }
 
