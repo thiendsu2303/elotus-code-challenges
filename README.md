@@ -1,5 +1,13 @@
 # elotus-code-challenges
 
+Monorepo containing three parts: DSA challenges, a backend API, and a frontend demo.
+
+## Repository Overview
+
+- `dsa-challenges/`: Solutions for three DSA problems (Gray Code, Maximum Length of Repeated Subarray, Sum of Distances in Tree). Each challenge contains a `main.go` entry; run with `go run main.go` inside its folder.
+- `backend-hackathon/`: Backend API built for the hackathon requirements. Includes a Gin server, PostgreSQL via Docker Compose, database migrations, and Swagger documentation.
+- `front-end-demo/`: Next.js app demonstrating login, register, and file upload using the backend API.
+
 Quickstart to run the backend API and the frontend demo locally, then try the upload flow.
 
 ## Prerequisites
